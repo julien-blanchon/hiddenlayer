@@ -82,7 +82,10 @@ def import_graph(hl_graph, model, args, input_names=None, verbose=False):
         # Op
         op = torch_node.kind()
         # Parameters
-        params = {k: torch_node[k] for k in torch_node.attributeNames()} 
+        # original params throws 'torch._C.Node' not subscriptable error, fixed with @hep-raidium
+        #suggestion in https://github.com/MIC-DKFZ/nnUNet/issues/1070
+        #params = {k: torch_node[k] for k in torch_node.attributeNames()}
+        params = {k: getattr(torch_node, torch_node.kindOf(k))(k) for k in torch_node.attributeNames()}
         # Inputs/outputs
         # TODO: inputs = [i.unique() for i in node.inputs()]
         outputs = [o.unique() for o in torch_node.outputs()]
