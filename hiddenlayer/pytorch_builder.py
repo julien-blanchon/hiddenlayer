@@ -70,12 +70,10 @@ def import_graph(hl_graph, model, args, input_names=None, verbose=False):
     trace, out = torch.jit._get_trace_graph(model, args)
     try:
         torch_graph = torch.onnx._optimize_trace(trace, torch.onnx.OperatorExportTypes.ONNX)
-    except Exception as e:
-        torch_graph = torch.onnx._optimize_graph(trace, torch.onnx.OperatorExportTypes.ONNX)
     except TypeError as e:
         torch_graph = trace
-
-
+    except Exception as e:
+        torch_graph = torch.onnx._optimize_graph(trace, torch.onnx.OperatorExportTypes.ONNX)
 
     # Dump list of nodes (DEBUG only)
     if verbose:
